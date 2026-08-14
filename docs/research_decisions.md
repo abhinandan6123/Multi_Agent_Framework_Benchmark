@@ -14,11 +14,11 @@ IEEE International Conference on Agentic AI
 
 ## Full Paper Format
 
-Detailed research paper, approximately 18–22 pages before compression.
+Internal master manuscript: approximately 18–22 pages before compression.
 
 ## IEEE Submission Format
 
-IEEE conference version, compressed to the official page limit after the full paper is complete.
+IEEE ICA 2026 regular paper: maximum 6 pages, using the official IEEE Conference Proceedings format.
 
 ## Frameworks
 
