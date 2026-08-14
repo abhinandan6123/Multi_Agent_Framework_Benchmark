@@ -1,0 +1,70 @@
+project:
+  title: "Comparative Evaluation of Multi-Agent AI Frameworks for Real-World Task Automation"
+  version: "0.1.0"
+  date_started: "2026-08-14"
+
+frameworks:
+  - name: "LangGraph"
+    version: "PENDING"
+  - name: "CrewAI"
+    version: "PENDING"
+  - name: "AutoGen"
+    version: "PENDING"
+
+llm:
+  provider: "PENDING"
+  model: "PENDING"
+  temperature: "PENDING"
+  max_tokens: "PENDING"
+  top_p: "PENDING"
+
+tasks:
+  - id: "T1"
+    name: "Research Synthesis Agent"
+  - id: "T2"
+    name: "Customer Support Triage"
+  - id: "T3"
+    name: "Data Cleaning Pipeline"
+  - id: "T4"
+    name: "Travel Planning Assistant"
+  - id: "T5"
+    name: "Code Review and Refactoring Agent"
+
+experiment:
+  runs_per_task: "PENDING"
+  random_seed: "PENDING"
+  timeout_seconds: "PENDING"
+  concurrency_levels:
+    - 1
+    - "PENDING"
+
+metrics:
+  performance:
+    - task_completion_rate
+    - accuracy
+    - reasoning_quality
+  efficiency:
+    - latency
+    - throughput
+    - input_tokens
+    - output_tokens
+    - api_cost
+  reliability:
+    - failure_rate
+    - recovery_success
+    - consistency
+  engineering:
+    - loc
+    - development_time
+    - debugging_effort
+    - maintainability
+
+hardware:
+  cpu: "PENDING"
+  gpu: "PENDING"
+  ram: "PENDING"
+  operating_system: "PENDING"
+
+software:
+  python: "PENDING"
+  docker: "PENDING"
