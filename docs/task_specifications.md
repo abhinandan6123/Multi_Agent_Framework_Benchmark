@@ -1,14 +1,36 @@
 # Task Specifications — Index
 
-Working scope for today. Do not add more tasks yet — a smaller, well-controlled benchmark is stronger than a large, poorly controlled one. Full one-page specs live in `tasks/<task_folder>/scope.md`; fill each in before implementation begins.
+All five specifications are complete as of Phase 1 (2026-08-23). The suite stays
+at five: a smaller, well-controlled benchmark is stronger than a large, poorly
+controlled one, and every task multiplies out across 3 frameworks × 10 runs.
+Authoritative specs live in `tasks/<task_folder>/scope.md`.
 
-| ID | Name | Folder | Status |
-|---|---|---|---|
-| T1 | Research Synthesis Agent | `tasks/task_01_research/scope.md` | Not Started |
-| T2 | Customer Support Triage | `tasks/task_02_support/scope.md` | Not Started |
-| T3 | Data Cleaning Pipeline | `tasks/task_03_data_cleaning/scope.md` | Not Started |
-| T4 | Travel Planning Assistant | `tasks/task_04_travel_planning/scope.md` | Not Started |
-| T5 | Code Review and Refactoring Agent | `tasks/task_05_code_review/scope.md` | Not Started |
+The tasks are chosen to differ in **coordination pattern**, not just subject
+matter — five tasks demanding the same control flow would measure one framework
+capability five times.
+
+| ID | Name | Coordination pattern | Spec | Fixtures |
+|---|---|---|---|---|
+| T1 | Research Synthesis Agent | Parallel fan-out, then merge | Complete | Not Started |
+| T2 | Customer Support Triage | Sequential + conditional branch | Complete | Not Started |
+| T3 | Data Cleaning Pipeline | Sequential + tool execution | Complete | Not Started |
+| T4 | Travel Planning Assistant | Iterative constraint-repair loop | Complete | Not Started |
+| T5 | Code Review and Refactoring Agent | Critique + revision + verify gate | Complete | Not Started |
+
+**Fixture work is the Phase 1 → Phase 2 handoff.** Each task's hard gate depends
+on a golden reference that does not exist yet:
+
+| Task | Fixture to build |
+|---|---|
+| T1 | `corpus_v1`: 40 abstracts, relevance labels, 6 near-misses, 2 contradictory pairs |
+| T2 | `batch_v1`: 12 gold-labelled tickets, 4 requiring escalation, 1 injection attempt |
+| T3 | `sales_raw_v1`: 200 rows, 6 injected defect classes + injection manifest + golden clean CSV |
+| T4 | `options_v1`: transport/lodging/activity table, **calibrated** so a naive plan overruns budget by 15–25% |
+| T5 | `inventory_v1`: ~180-line module, 4 seeded defects, 3 false-positive traps, test suite + hidden tests |
+
+Calibration must be confirmed by pilot runs (`--runs 1`) before the 150-run
+group. If all three frameworks floor or ceiling on a task, the fixture is wrong
+— that is not a finding about the frameworks.
 
 ## One-line descriptions
 
