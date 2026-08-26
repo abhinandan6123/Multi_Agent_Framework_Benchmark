@@ -1,70 +1,168 @@
 project:
   title: "Comparative Evaluation of Multi-Agent AI Frameworks for Real-World Task Automation"
-  version: "0.1.0"
+  version: "0.2.0"
   date_started: "2026-08-14"
+  phase: "Phase 1 - Foundations & Methodology"
 
+# ---------------------------------------------------------------------------
+# Frameworks under test.
+# LOCKED = pinned in requirements.txt and verified installed.
+# PENDING_INSTALL = version to be recorded by scripts/record_environment.py
+#                   at first install; do not hand-write a guess.
+# ---------------------------------------------------------------------------
 frameworks:
   - name: "LangGraph"
-    version: "PENDING"
+    paradigm: "explicit state graph"
+    adapter: "benchmark/langgraph"
+    version: "PENDING_INSTALL"
   - name: "CrewAI"
-    version: "PENDING"
+    paradigm: "role-based crew"
+    adapter: "benchmark/crewai"
+    version: "PENDING_INSTALL"
   - name: "AutoGen"
-    version: "PENDING"
+    paradigm: "conversational multi-agent"
+    adapter: "benchmark/autogen"
+    version: "PENDING_INSTALL"
 
+# ---------------------------------------------------------------------------
+# LLM configuration. Identical across all three frameworks.
+# ---------------------------------------------------------------------------
 llm:
-  provider: "PENDING"
-  model: "PENDING"
-  temperature: "PENDING"
-  max_tokens: "PENDING"
-  top_p: "PENDING"
+  provider: "Anthropic (first-party Claude API)"
+  model: "claude-sonnet-5"
+  context_window_tokens: 1000000
+  max_tokens: 4096
+  # Claude Sonnet 5 REMOVED the sampling parameters. Sending temperature,
+  # top_p or top_k returns HTTP 400. Determinism is therefore not controlled
+  # via temperature; see docs/research_decisions.md and Section 3.6.
+  temperature: "NOT_CONFIGURABLE"
+  top_p: "NOT_CONFIGURABLE"
+  top_k: "NOT_CONFIGURABLE"
+  # Reasoning depth is the controllable analogue of temperature on this model.
+  thinking: "disabled"
+  effort: "medium"
+  stop_sequences: null
+  # Retries are handled by the harness, not the SDK, so that every retry is
+  # visible in the logs and countable for the reliability metrics.
+  sdk_max_retries: 0
+  request_timeout_seconds: 300
+
+judge_llm:
+  # A separate, more capable model scores the rubric dimensions so that the
+  # system under test never grades its own output.
+  provider: "Anthropic (first-party Claude API)"
+  model: "claude-opus-5"
+  max_tokens: 2048
+  thinking: "disabled"
+  effort: "high"
+  judges_per_output: 3
+  aggregation: "median"
+
+pricing:
+  # Snapshot used for every cost figure in the paper. Standard (non-intro)
+  # first-party Claude API list price. Intro pricing for claude-sonnet-5
+  # ($2.00 / $10.00 per MTok, through 2026-08-31) is deliberately NOT used, so
+  # that reported costs remain valid after the promotional window closes.
+  snapshot_date: "2026-08-23"
+  currency: "USD"
+  unit: "per 1,000,000 tokens"
+  claude-sonnet-5:
+    input: 3.00
+    output: 15.00
+  claude-opus-5:
+    input: 5.00
+    output: 25.00
+  cache_read_multiplier: 0.1
+  cache_write_multiplier: 1.25
 
 tasks:
   - id: "T1"
     name: "Research Synthesis Agent"
+    coordination_pattern: "parallel fan-out then merge"
+    scope: "tasks/task_01_research/scope.md"
   - id: "T2"
     name: "Customer Support Triage"
+    coordination_pattern: "sequential with conditional escalation"
+    scope: "tasks/task_02_support/scope.md"
   - id: "T3"
     name: "Data Cleaning Pipeline"
+    coordination_pattern: "sequential with tool execution"
+    scope: "tasks/task_03_data_cleaning/scope.md"
   - id: "T4"
     name: "Travel Planning Assistant"
+    coordination_pattern: "iterative constraint repair loop"
+    scope: "tasks/task_04_travel_planning/scope.md"
   - id: "T5"
     name: "Code Review and Refactoring Agent"
+    coordination_pattern: "reviewer / refactorer / verifier debate"
+    scope: "tasks/task_05_code_review/scope.md"
 
 experiment:
-  runs_per_task: "PENDING"
-  random_seed: "PENDING"
-  timeout_seconds: "PENDING"
-  concurrency_levels:
-    - 1
-    - "PENDING"
+  runs_per_cell: 10          # 3 frameworks x 5 tasks x 10 runs = 150 runs
+  run_order: "interleaved"   # round-robin over cells; never all runs of one
+                             # cell back to back (guards against API drift)
+  random_seed: 20260823      # seeds harness-side choices only (run order,
+                             # input-instance selection, judge sampling)
+  timeout_seconds: 600       # per run, wall clock
+  max_agent_steps: 25        # hard step ceiling per run, identical per adapter
+  retry_policy:
+    max_retries: 2           # harness-level; every attempt logged separately
+    retry_on: ["timeout", "transport_error", "rate_limit", "schema_invalid"]
+    backoff: "exponential"
+    backoff_base_seconds: 4
+  concurrency_levels: [1, 2, 4, 8]   # throughput / scalability sweep
+  concurrency_sweep_tasks: ["T2", "T3"]  # cheap, deterministic tasks only
+  concurrency_sweep_runs_per_level: 8
 
 metrics:
   performance:
     - task_completion_rate
-    - accuracy
+    - accuracy_f1
     - reasoning_quality
   efficiency:
-    - latency
-    - throughput
+    - latency_seconds
+    - throughput_tasks_per_minute
     - input_tokens
     - output_tokens
-    - api_cost
+    - api_cost_usd
   reliability:
     - failure_rate
-    - recovery_success
-    - consistency
+    - recovery_success_rate
+    - output_consistency
+  resource:
+    - peak_rss_mb
+    - concurrency_degradation
   engineering:
     - loc
-    - development_time
+    - development_time_hours
     - debugging_effort
     - maintainability
 
+statistics:
+  alpha: 0.05
+  ci_method: "bootstrap_percentile"
+  bootstrap_resamples: 10000
+  omnibus_test: "kruskal_wallis"        # 3 frameworks, non-normal latency
+  pairwise_test: "mann_whitney_u"
+  multiple_comparison_correction: "holm"
+  effect_size: "cliffs_delta"
+  proportion_test: "fisher_exact"       # completion / failure rates
+
+# ---------------------------------------------------------------------------
+# Execution environment. Recorded from the machine that ran the experiments.
+# ---------------------------------------------------------------------------
 hardware:
-  cpu: "PENDING"
-  gpu: "PENDING"
-  ram: "PENDING"
-  operating_system: "PENDING"
+  machine: "Apple Mac (arm64)"
+  cpu: "Apple M4 Pro"
+  cpu_cores: 14
+  gpu: "Integrated Apple GPU; unused (all inference is remote)"
+  ram_gb: 24
+  operating_system: "macOS 15.3.1 (build 24D70)"
+  network: "Consumer broadband; all LLM inference is remote, so latency
+    includes network round-trip time. See Section 3.9, internal validity."
 
 software:
-  python: "PENDING"
-  docker: "PENDING"
+  python: "3.11.7"
+  docker: "not used"
+  dependency_pin_file: "benchmark/requirements.txt"
+  environment_record: "experiments/configs/environment.json"

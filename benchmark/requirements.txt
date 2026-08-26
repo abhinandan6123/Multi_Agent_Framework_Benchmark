@@ -1,0 +1,30 @@
+# Pinned dependency set. Versions are filled from the resolved install and
+# recorded in experiments/configs/environment.json; run
+#   python benchmark/scripts/record_environment.py
+# after installing, then pin from that file.
+#
+# Each framework gets its OWN virtual environment. The three have overlapping
+# and mutually incompatible constraints on shared libraries, and resolving them
+# into one environment would silently downgrade one framework's dependencies and
+# change what is being measured (Section 3.5).
+
+# --- shared, all environments ---
+anthropic
+pandas==3.0.3
+numpy==2.4.6
+scipy==1.17.1
+psutil
+jsonschema
+PyYAML
+pytest
+rank-bm25            # T1 local corpus retrieval
+
+# --- env: langgraph ---
+# langgraph
+# langchain-core
+
+# --- env: crewai ---
+# crewai
+
+# --- env: autogen ---
+# autogen-agentchat

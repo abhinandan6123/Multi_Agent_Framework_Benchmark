@@ -4,7 +4,10 @@ A reproducible benchmarking study of **LangGraph**, **CrewAI**, and **AutoGen** 
 
 ## Status
 
-**Phase 0 — Setup** (started 2026-08-14). See `docs/experiment_log.md` for the running log.
+**Phase 1 — Methods & Reproducibility Core** (2026-08-23). Section 3 is written,
+all constants are locked, and the shared harness is implemented. Framework
+adapters are not yet built and no experiments have been run — see
+`docs/experiment_log.md` for the running log and the explicit pending list.
 
 ## Project Structure
 
@@ -30,6 +33,8 @@ multi-agent-framework-benchmark/
 - `docs/metric_definitions.md` — precise definitions for every metric reported.
 - `docs/experiment_log.md` — running day-by-day log (update daily).
 - `benchmark/config.yaml` — single source of truth for experiment configuration.
+- `docs/log_schema.md` — **frozen contract** for raw logs and derived CSVs.
+- `paper/full_version/section_03_methodology.md` — the written methodology (Section 3).
 
 ## Frameworks Compared
 
@@ -44,6 +49,34 @@ multi-agent-framework-benchmark/
 - T3: Data Cleaning Pipeline
 - T4: Travel Planning Assistant
 - T5: Code Review and Refactoring Agent
+
+## Locked Configuration
+
+| Factor | Value |
+|---|---|
+| Model | `claude-sonnet-5` (Anthropic first-party API), 1M context |
+| Parameters | `max_tokens` 4096, `thinking` disabled, `effort` medium |
+| Sampling | **Not controllable** — Sonnet 5 rejects `temperature`/`top_p`/`top_k` |
+| Runs | 10 per (framework, task) cell → 150 runs, interleaved round-robin, seed 20260823 |
+| Evaluation | Hybrid: deterministic rules/golden refs for hard gates; blinded 3-judge `claude-opus-5` ensemble for rubrics only |
+| Pricing snapshot | 2026-08-23, \$3.00/\$15.00 per MTok (standard list, not intro rate) |
+| Host | Apple M4 Pro, 14 cores, 24 GB, macOS 15.3.1, CPython 3.11.7 |
+
+Framework versions are **not** hand-written — they are recorded by
+`benchmark/scripts/record_environment.py` and the metric layer refuses any run
+group still carrying `PENDING_INSTALL`.
+
+## Running It
+
+```bash
+python benchmark/scripts/record_environment.py        # record actual versions
+python -m benchmark.common.harness --dry-run          # inspect the run schedule
+python -m benchmark.common.harness --runs 1           # pilot (needs adapters + API key)
+python -m benchmark.common.metrics <run_group_dir> --strict   # derive CSVs, offline
+```
+
+The metric and analysis stages need **no API access**: given the published raw
+logs, every number in the results section can be regenerated offline.
 
 ## Reproducibility Rule
 
