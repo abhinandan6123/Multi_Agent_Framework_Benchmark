@@ -104,7 +104,7 @@ source of truth is `benchmark/config.yaml`.
 | Judge model | **Locked** | `claude-opus-5`, `effort: high`, 3 judges, median aggregation, blinded to framework |
 | Cost calculation | **Locked** | Pricing snapshot 2026-08-23: `claude-sonnet-5` \$3.00/\$15.00 per MTok (standard list, **not** the intro rate). Cache read 0.1×, cache write 1.25×. Derived from logged tokens; judge tokens excluded. |
 | Scalability test | **Locked** | Concurrency 1/2/4/8 on T2 and T3 only, 8 runs per level. A cost-bounded sweep, reported as such. |
-| Developer study | **Locked** | Single developer (`akash.shastri@query.ai`). Time recorded contemporaneously in `docs/experiment_log.md`, split implementation/debugging. Implementation order carried into `engineering.csv` so the learning-order confound is analysable, not merely disclosed. |
+| Developer study | **Locked** |. Time recorded contemporaneously in `docs/experiment_log.md`, split implementation/debugging. Implementation order carried into `engineering.csv` so the learning-order confound is analysable, not merely disclosed. |
 | Statistics | **Locked** | Kruskal–Wallis omnibus, Mann–Whitney U pairwise, Holm correction, Cliff's delta, Fisher's exact for proportions, bootstrap percentile CIs (10,000 resamples), α = 0.05 |
 
 ### Note on the absence of temperature control
